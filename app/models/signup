@@ -1,0 +1,24 @@
+var db = require('../helpers/db')
+
+exports.create = function(email, password, fname, lname, uname, done) {
+    var values = [email, password, fname, lname, uname]
+
+    db.get().query('INSERT INTO users (email, password, fname, lname, uname) VALUES(?, ?, ?, ?, ?)', values, function(err, result) {
+        if (err) return done(result, err)
+        done(result.insertId, err)
+    })
+}
+
+exports.getAll = function(done) {
+    db.get().query('SELECT * FROM users', function (err, rows) {
+        if (err) return done(rows, err)
+        done(rows, err)
+    })
+}
+
+exports.getAllByUser = function(email, done) {
+    db.get().query('SELECT * FROM users WHERE email = ?', email, function (err, rows) {
+        if (err) return done(rows, err)
+        done(rows, err)
+    })
+}

@@ -1,0 +1,45 @@
+'use strict';
+module.exports = function(app) {
+    var loginModel = require('../models/login');
+
+    // todoList Routes
+    app.route('/login')
+        .get(function (req, res) {
+            res.send('WOTOPA login get')
+        })
+        .post(function (req, res) {
+            // var str = JSON.stringify(req);
+            var email = req.body.email;
+            var password = req.body.password;
+
+            loginModel.getAllByUser(email, password, function (d, err) {
+                console.log(d)
+                console.log(err)
+                var data = {}
+                if(!err){
+                    if(d.length > 0){
+                        data = {
+                            response: true,
+                            msg: "User logged in!"
+                        }
+                        res.send(data)
+                    }else {
+                        data = {
+                            response: false,
+                            msg: "Invalid Email or Password!"
+                        }
+                        res.send(data)
+                    }
+
+                }else {
+                    res.status(500).send('BC Something broke!')
+                }
+            });
+        });
+
+
+    // app.route('/tasks/:taskId')
+    //     .get(signupModel.read_a_task)
+    //     .put(signupModel.update_a_task)
+    //     .delete(signupModel.delete_a_task);
+};

@@ -1,0 +1,23 @@
+var db = require('../helpers/db')
+
+
+exports.create = function(user_email, title, description, img, price, done) {
+    var values = [user_email, title, description, img, price]
+
+
+    // db.get().query('INSERT INTO listings (user_email, title, description, img, price) VALUES(?, ?, ?, ?, ?)', values, function(err, result) {
+    //     if (err) return done(result, err)
+    //     done(result.insertId, err)
+    // })
+    db.get().query('INSERT INTO listings (user_email, title, description, img, price) VALUES ((SELECT email FROM users WHERE email = ?), ?, ?, ?, ?)', values, function(err, result) {
+        if (err) return done(result, err)
+        done(result.insertId, err)
+    })
+}
+
+exports.getAll = function(done) {
+    db.get().query('SELECT * FROM listings', function (err, rows) {
+        if (err) return done(rows, err)
+        done(rows, err)
+    })
+}

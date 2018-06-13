@@ -1,0 +1,90 @@
+'use strict';
+module.exports = function(app) {
+    var async = require("async");
+    var listingModel = require('../models/listing');
+    var awsSDK = require('../helpers/aws-helper');
+
+    // todoList Routes
+    app.route('/createListing')
+        .get(function (req, res) {
+            res.send('WOTOPA createListing get')
+        })
+        .post(function (req, res) {
+            // var str = JSON.stringify(req);
+            var user_email = req.body.user_email;
+            var title = req.body.title;
+            var description = req.body.description;
+            var img = req.body.img;
+            var price = req.body.price;
+            //user_email, title, desc, img, price
+            awsSDK.uploadImg(img, function (imgName, err) {
+                if(!err){
+                    listingModel.create(user_email, title, description, imgName, price, function (d, err) {
+                        console.log(d);
+                        console.log(err);
+                        var data = {};
+                        if(!err){
+                            data = {
+                                response: true,
+                                msg: "Listing Created!"
+                            }
+                            res.send(data)
+                        }else {
+                            res.status(500).send('BC Something broke!')
+                        }
+                    });
+                }else {
+                    res.status(500).send('BC Something broke!')
+                }
+            });
+
+        });
+
+    app.route('/getListings')
+        .get(function (req, res) {
+            res.send('WOTOPA getListings get')
+        })
+        .post(function (req, res) {
+            // var str = JSON.stringify(req);
+            //user_email, title, desc, img, price
+
+            listingModel.getAll(function (d, err) {
+                console.log(d);
+                console.log(err);
+
+                var data = {};
+                if(!err){
+                    // console.log('dddddddddddddd');
+                    // console.log(d[0].img);
+                    async.each(d, function (item, next) {
+                        console.log('Print item');
+                        console.log(item);
+                        var imgName = item.img;
+                        awsSDK.getS3Url(imgName, function (url, err) {
+                            if(!err){
+                                item.img = url;
+                                next();
+                            }else {
+                                // res.status(500).send('BC Something broke!')
+                            }
+                        });
+                    },function (err) {
+                        data = {
+                            response: true,
+                            msg: "Got listings!",
+                            data: d
+                        };
+                        res.send(data);
+                    });
+                }else {
+                    res.status(500).send('BC Something broke!')
+                }
+            });
+        });
+
+
+    // app.route('/tasks/:taskId')
+    //     .get(signupModel.read_a_task)
+    //     .put(signupModel.update_a_task)
+    //     .delete(signupModel.delete_a_task);
+};

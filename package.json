@@ -1,0 +1,17 @@
+{
+  "name": "nosh-node",
+  "version": "1.0.0",
+  "description": "Nosh APIs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Varad Shere",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "aws-sdk": "^2.243.1",
+    "express": "^4.16.3",
+    "mysql": "^2.15.0"
+  }
+}

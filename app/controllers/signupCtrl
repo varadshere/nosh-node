@@ -1,0 +1,58 @@
+'use strict';
+module.exports = function(app) {
+    var signupModel = require('../models/signup');
+
+    // todoList Routes
+    app.route('/signup')
+        .get(function (req, res) {
+            res.send('WOTOPA signup get')
+        })
+        .post(function (req, res) {
+            // var str = JSON.stringify(req);
+            var email = req.body.email
+            console.log(email)
+            var password = req.body.password
+            var fname = req.body.fname
+            var lname = req.body.lname
+            var uname = req.body.uname
+            signupModel.getAllByUser(email, function (d, err) {
+                console.log(d)
+                console.log(err)
+                var data = {}
+                if(!err){
+                    if(d.length < 1){
+                        signupModel.create(email, password, fname, lname, uname, function (result, err) {
+                            if(!err){
+                                data = {
+                                    response: true,
+                                    msg: "Signup Successful!"
+                                }
+                            }else {
+                                data = {
+                                    response: false,
+                                    msg: err
+                                }
+                            }
+                            res.send(data)
+                        })
+
+                    }else {
+                         data = {
+                            response: false,
+                            msg: "User already exists!"
+                        }
+                        res.send(data)
+                    }
+
+                }else {
+                    res.status(500).send('BC Something broke!')
+                }
+            });
+        });
+
+
+    // app.route('/tasks/:taskId')
+    //     .get(signupModel.read_a_task)
+    //     .put(signupModel.update_a_task)
+    //     .delete(signupModel.delete_a_task);
+};
